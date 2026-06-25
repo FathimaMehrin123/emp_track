@@ -6,7 +6,7 @@ from fastapi import APIRouter, Depends
 from backend.app.database.database import SessionLocal
 from backend.app.models.attendance_model import Attendance
 from backend.app.utils.auth_util import get_current_user
-
+from sqlalchemy import extract
 router = APIRouter(prefix="/attendance", tags=["Attendance"])
 
 
@@ -72,17 +72,15 @@ def attendance_history(
     query = db.query(Attendance).filter(
         Attendance.user_id == user_id
     )
-
     if month:
-        query = query.filter(
-            Attendance.attendance_date.extract("month") == month
-        )
+      query = query.filter(
+        extract("month", Attendance.attendance_date) == month
+     )
 
     if year:
-        query = query.filter(
-            Attendance.attendance_date.extract("year") == year
-        )
-
+      query = query.filter(
+        extract("year", Attendance.attendance_date) == year
+    )
     limit = 10
     # Skip the records from previous pages.
     offset = (page - 1) * limit
