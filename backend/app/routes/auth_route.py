@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Depends, status
 from backend.app.database.database import SessionLocal
-from backend.app.models.user import User
+from backend.app.models.user_model import User
 from backend.app.schemas.auth_schema import RegisterData, LoginData
 from backend.app.utils.auth_util import pwd_context, create_access_token, get_current_user
-
+from fastapi.security import OAuth2PasswordRequestForm
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
 
@@ -44,12 +44,18 @@ def register(data: RegisterData):
 
     return {"message": "User registered successfully"}
 
-
 @router.post("/login")
-def login(data: LoginData):
+def login(data: OAuth2PasswordRequestForm = Depends()):
+    # data: LoginData
+    # OAuth2PasswordRequestForm reads login credentials as form data
+    # (username and password) instead of JSON.
+    # Here, the username field contains the user's email.
+    # LoginData (Pydantic): Expects JSON -> {"email": "...", "password": "..."}
+    # OAuth2PasswordRequestForm: Expects form data -> username=...&password=...
+    # In this project, the username field is used to store the user's email.
     db = SessionLocal()
 
-    user = db.query(User).filter(User.email == data.email).first()
+    user = db.query(User).filter(User.email == data.username).first()
 
     if user is None:
         db.close()
@@ -75,10 +81,10 @@ def login(data: LoginData):
     db.close()
 
     return {
-        "token": access_token,
+        "access_token": access_token,
+        "token_type": "bearer",
         "role": user.role
     }
-
 
 # @router.get("/profile")
 # def profile(current_user=Depends(get_current_user)):

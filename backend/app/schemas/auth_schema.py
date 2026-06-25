@@ -8,6 +8,6 @@ class RegisterData(BaseModel):
     role: str = "employee"
 
 
-class LoginData(BaseModel):
-    email: str
-    password: str
+# class LoginData(BaseModel):
+#     email: str
+#     password: str
