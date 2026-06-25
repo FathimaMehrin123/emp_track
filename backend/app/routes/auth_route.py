@@ -19,6 +19,10 @@ def register(data: RegisterData):
         db.close()
         return {"error": "Password must contain at least 6 characters"}
 
+    if len(data.password.encode("utf-8")) > 72:
+        db.close()
+        return {"error": "Password cannot be longer than 72 bytes"}
+
     existing_email = db.query(User).filter(User.email == data.email).first()
 
     if existing_email:
