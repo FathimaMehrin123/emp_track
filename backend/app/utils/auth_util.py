@@ -5,11 +5,7 @@ from jose import JWTError, jwt
 from passlib.context import CryptContext
 from backend.app.config import SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES
 
-# Used for password hashing and verification.
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-# Reads Bearer token from Authorization header.
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
 
 
 def create_access_token(data: dict):
@@ -26,6 +22,9 @@ def create_access_token(data: dict):
         SECRET_KEY,
         algorithm=ALGORITHM
     )
+
+# Reads Bearer token from Authorization header.
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
 
 
 def get_current_user(token: str = Depends(oauth2_scheme)):
@@ -49,3 +48,7 @@ def get_current_user(token: str = Depends(oauth2_scheme)):
 
     except JWTError:
         return {"error": "Invalid token"}
+    
+
+# Used for password hashing and verification.
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")    
