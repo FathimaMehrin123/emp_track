@@ -5,6 +5,7 @@ from backend.app.routes.auth_route import router as auth_router
 from backend.app.routes.attendance_route import router as attendance_router
 from backend.app.routes.leave_route import router as leave_router
 from backend.app.routes.admin_route import router as admin_router
+from backend.app.routes.admin_route import router as employee_router
 
 
 from backend.app.models import user_model
@@ -19,3 +20,4 @@ app.include_router(auth_router)
 app.include_router(attendance_router)
 app.include_router(leave_router)
 app.include_router(admin_router)
+app.include_router(employee_router)

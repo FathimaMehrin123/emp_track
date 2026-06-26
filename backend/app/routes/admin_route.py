@@ -9,6 +9,7 @@ from backend.app.models.attendance_model import Attendance
 from backend.app.models.leave_model import LeaveRequest
 from backend.app.schemas.leave_schema import LeaveApprovalData
 from backend.app.utils.auth_util import get_current_user
+from sqlalchemy import or_
 
 router = APIRouter(prefix="/admin", tags=["Admin"])
 
@@ -98,3 +99,48 @@ def update_leave_status(
     return {
         "message": f"Leave request {data.status.lower()} successfully"
     }
+
+
+@router.get("/employees")
+def employee_list(
+    search: str | None = None,
+    current_user=Depends(get_current_user)
+):
+    # Validate JWT.
+    if isinstance(current_user, dict) and "error" in current_user:
+        return current_user
+
+    # Only admin can access.
+    if current_user["role"] != "admin":
+        return {"error": "Only admin can access this route"}
+
+    db = SessionLocal()
+
+    query = db.query(User).filter(
+        User.role == "employee"
+    )
+
+    # Search by employee name or email.
+    # or_() is a SQLAlchemy function that creates an SQL OR condition,Return rows where at least one of the conditions is true.
+    
+    if search:
+        query = query.filter(
+            or_(
+                User.name.ilike(f"%{search}%"),
+                User.email.ilike(f"%{search}%")
+            )
+        )
+
+    employees = query.order_by(User.name).all()
+
+    db.close()
+
+    return [
+        {
+            "id": str(employee.id),
+            "name": employee.name,
+            "email": employee.email,
+            "role": employee.role
+        }
+        for employee in employees
+    ]
