@@ -3,30 +3,36 @@ import 'package:flutter/material.dart';
 class DashboardCard extends StatelessWidget {
   final String title;
   final String value;
+  final VoidCallback? onTap;
 
   const DashboardCard({
+    super.key,
     required this.title,
     required this.value,
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 3,
-      child: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              value,
-              style: const TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
+    return InkWell(
+      onTap: onTap,
+      child: Card(
+        elevation: 3,
+        child: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                value,
+                style: const TextStyle(
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-            ),
-            const SizedBox(height: 8),
-            Text(title),
-          ],
+              const SizedBox(height: 8),
+              Text(title),
+            ],
+          ),
         ),
       ),
     );

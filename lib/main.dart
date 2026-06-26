@@ -1,4 +1,6 @@
+import 'package:emp_track/features/admin/viemodels/all_leave_requests_viewmodel.dart';
 import 'package:emp_track/features/admin/viemodels/dashboard_viewmodel.dart';
+import 'package:emp_track/features/admin/viemodels/employee_list_viewmodel.dart';
 
 import 'package:emp_track/features/authentication/view/login_page.dart';
 import 'package:emp_track/features/authentication/viewmodels/auth_viewmodel.dart';
@@ -16,6 +18,9 @@ void main() {
           ChangeNotifierProvider(
           create: (_) => AuthViewModel(),
         ),
+        ChangeNotifierProvider(create: (_) => AllLeaveRequestsViewmodel()),
+                ChangeNotifierProvider(create: (_) => EmployeeListViewModel()),
+
       ],
       child: const MyApp(),
     ),
@@ -27,6 +32,6 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(home: LoginPage());
+    return const MaterialApp(home: LoginPage(),debugShowCheckedModeBanner: false,);
   }
 }

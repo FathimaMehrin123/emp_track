@@ -64,4 +64,21 @@ class AdminApiService {
 
     return jsonDecode(response.body);
   }
+
+Future<List<dynamic>> getAllLeaveRequests({
+  required String token,
+}) async {
+  final response = await http.get(
+    Uri.parse("${ApiConstants.baseUrl}/admin/leaves"),
+    headers: {
+      "Authorization": "Bearer $token",
+    },
+  );
+
+  return jsonDecode(response.body);
 }
+
+
+}
+
+

@@ -144,3 +144,43 @@ def employee_list(
         }
         for employee in employees
     ]
+
+
+@router.get("/leaves")
+def get_all_leave_requests(current_user=Depends(get_current_user)):
+    # Validate JWT token.
+    if isinstance(current_user, dict) and "error" in current_user:
+        return current_user
+
+    # Allow only admins.
+    if current_user["role"] != "admin":
+        return {"error": "Only admin can access this route"}
+
+    db = SessionLocal()
+
+    # Get every leave request along with the employee details.
+    leave_requests = (
+        db.query(LeaveRequest, User)
+        .join(User, LeaveRequest.user_id == User.id)
+        .order_by(LeaveRequest.created_at.desc())
+        .all()
+    )
+
+    db.close()
+
+    return [
+        {
+            "id": str(leave.id),
+            "employee_id": str(user.id),
+            "employee_name": user.name,
+            "employee_email": user.email,
+            "leave_type": leave.leave_type,
+            "start_date": leave.start_date,
+            "end_date": leave.end_date,
+            "reason": leave.reason,
+            "status": leave.status,
+            "admin_comment": leave.admin_comment,
+            "created_at": leave.created_at,
+        }
+        for leave, user in leave_requests
+    ]

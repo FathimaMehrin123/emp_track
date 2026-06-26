@@ -42,7 +42,7 @@ class _RegisterPageState extends State<RegisterPage> {
               obscureText: true,
             ),
             DropdownButtonFormField<String>(
-              value: selectedRole,
+              initialValue: selectedRole,
               items: const [
                 DropdownMenuItem(
                   value: "employee",
