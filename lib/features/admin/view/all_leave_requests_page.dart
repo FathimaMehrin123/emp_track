@@ -34,7 +34,9 @@ class _LeaveRequestsPageState extends State<AllLeaveRequestsPage> {
                 return Card(
                   margin: const EdgeInsets.all(10),
                   child: ListTile(
-                    title: Text("${leave["employee_name"] ?? ""} - ${leave["leave_type"]}"),
+                    title: Text(
+                      "${leave["employee_name"] ?? ""} - ${leave["leave_type"]}",
+                    ),
                     subtitle: Text(
                       "${leave["start_date"]} to ${leave["end_date"]}\n"
                       "Status: ${leave["status"]}\n"
@@ -46,23 +48,106 @@ class _LeaveRequestsPageState extends State<AllLeaveRequestsPage> {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               IconButton(
-                                icon: const Icon(Icons.check, color: Colors.green),
-                                onPressed: () {
-                                  viewModel.updateLeaveStatus(
-                                    leaveId: leave["id"],
-                                    status: "Approved",
-                                    adminComment: "Approved",
+                                icon: const Icon(
+                                  Icons.check,
+                                  color: Colors.green,
+                                ),
+                                onPressed: () async {
+                                  final commentController =
+                                      TextEditingController();
+
+                                  final comment = await showDialog<String>(
+                                    context: context,
+                                    builder: (context) {
+                                      return AlertDialog(
+                                        title: const Text("Approve Leave"),
+                                        content: TextField(
+                                          controller: commentController,
+                                          decoration: const InputDecoration(
+                                            labelText: "Admin Comment",
+                                            hintText: "Enter your comment",
+                                          ),
+                                          maxLines: 3,
+                                        ),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () =>
+                                                Navigator.pop(context),
+                                            child: const Text("Cancel"),
+                                          ),
+                                          ElevatedButton(
+                                            onPressed: () {
+                                              Navigator.pop(
+                                                context,
+                                                commentController.text,
+                                              );
+                                            },
+                                            child: const Text("Approve"),
+                                          ),
+                                        ],
+                                      );
+                                    },
                                   );
+
+                                  if (comment != null) {
+                                    viewModel.updateLeaveStatus(
+                                      leaveId: leave["id"],
+                                      status: "Approved",
+                                      adminComment: comment,
+                                    );
+                                  }
                                 },
                               ),
                               IconButton(
-                                icon: const Icon(Icons.close, color: Colors.red),
-                                onPressed: () {
-                                  viewModel.updateLeaveStatus(
-                                    leaveId: leave["id"],
-                                    status: "Rejected",
-                                    adminComment: "Rejected",
+                                icon: const Icon(
+                                  Icons.close,
+                                  color: Colors.red,
+                                ),
+                                onPressed: () async {
+                                  final commentController =
+                                      TextEditingController();
+
+                                  final comment = await showDialog<String>(
+                                    context: context,
+                                    builder: (context) {
+                                      return AlertDialog(
+                                        title: const Text("Reject Leave"),
+                                        content: TextField(
+                                          controller: commentController,
+                                          decoration: const InputDecoration(
+                                            labelText: "Admin Comment",
+                                            hintText:
+                                                "Enter reason for rejection",
+                                          ),
+                                          maxLines: 3,
+                                        ),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () =>
+                                                Navigator.pop(context),
+                                            child: const Text("Cancel"),
+                                          ),
+                                          ElevatedButton(
+                                            onPressed: () {
+                                              Navigator.pop(
+                                                context,
+                                                commentController.text,
+                                              );
+                                            },
+                                            child: const Text("Reject"),
+                                          ),
+                                        ],
+                                      );
+                                    },
                                   );
+
+                                  if (comment != null) {
+                                    viewModel.updateLeaveStatus(
+                                      leaveId: leave["id"],
+                                      status: "Rejected",
+                                      adminComment: comment,
+                                    );
+                                  }
                                 },
                               ),
                             ],
