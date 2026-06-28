@@ -1,4 +1,4 @@
-import 'package:emp_track/sevices/attendance_api_service.dart';
+
 import 'package:emp_track/sevices/employee_dashboard_api_service.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -6,7 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class EmployeeDashboardViewModel extends ChangeNotifier {
   final DashboardApiService _dashboardApiService = DashboardApiService();
-  final AttendanceApiService _attendanceApiService = AttendanceApiService();
+
 
   bool isLoading = false;
   String? errorMessage;
@@ -50,18 +50,5 @@ class EmployeeDashboardViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<String> markAttendance() async {
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString("token");
 
-    if (token == null) {
-      return "Token not found";
-    }
-
-    final result = await _attendanceApiService.checkIn(token: token);
-
-    await fetchDashboardStats();
-
-    return result["message"] ?? result["error"] ?? "Something went wrong";
-  }
 }

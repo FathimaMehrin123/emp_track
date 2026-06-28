@@ -23,6 +23,7 @@ class AttendanceViewModel extends ChangeNotifier {
     await fetchAttendanceHistory();
 
     return result["message"] ?? result["error"] ?? "Something went wrong";
+    
   }
 
   Future<void> fetchAttendanceHistory({

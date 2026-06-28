@@ -8,9 +8,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class AdminDashboardPage extends StatefulWidget {
-  final String token;
+  
 
-  const AdminDashboardPage({super.key, required this.token});
+  const AdminDashboardPage({super.key, });
 
   @override
   State<AdminDashboardPage> createState() => _AdminDashboardPageState();
@@ -21,12 +21,12 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
   void initState() {
     super.initState();
 
-    Future.microtask(() {
-      Provider.of<AdminDashboardViewModel>(
-        context,
-        listen: false,
-      ).fetchDashboardData(widget.token);
-    });
+ Future.microtask(() {
+  Provider.of<AdminDashboardViewModel>(
+    context,
+    listen: false,
+  ).fetchDashboardData();
+});
   }
 
   @override

@@ -1,5 +1,6 @@
+import 'package:emp_track/features/authentication/view/login_page.dart';
+import 'package:emp_track/features/authentication/viewmodels/auth_viewmodel.dart';
 import 'package:emp_track/features/employee/view/attendance_page.dart';
-import 'package:emp_track/features/employee/view/leave_history_page.dart';
 import 'package:emp_track/features/employee/view/leave_request_page.dart';
 import 'package:emp_track/features/employee/viewmodels/emp_dashbaord_viewmodel.dart';
 import 'package:emp_track/features/employee/widgets/emp_card.dart';
@@ -28,7 +29,25 @@ class _EmployeeDashboardPageState extends State<EmployeeDashboardPage> {
     final viewModel = context.watch<EmployeeDashboardViewModel>();
 
     return Scaffold(
-      appBar: AppBar(title: const Text("Employee Dashboard")),
+      appBar: AppBar(
+        title: const Text("Employee Dashboard"),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: () async {
+              await context.read<AuthViewModel>().logout();
+
+              if (context.mounted) {
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (_) => const LoginPage()),
+                  (route) => false,
+                );
+              }
+            },
+          ),
+        ],
+      ),
       body: viewModel.isLoading
           ? const Center(child: CircularProgressIndicator())
           : viewModel.errorMessage != null
@@ -38,45 +57,43 @@ class _EmployeeDashboardPageState extends State<EmployeeDashboardPage> {
               child: Column(
                 children: [
                   ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
+                    onPressed: () async {
+                      await Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (_) => const AttendancePage(),
                         ),
                       );
+
+                      if (mounted) {
+                        await context
+                            .read<EmployeeDashboardViewModel>()
+                            .fetchDashboardStats();
+                      }
                     },
+
                     child: const Text("Attendance"),
                   ),
 
                   const SizedBox(height: 12),
 
                   ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
+                    onPressed: () async {
+                      await Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (_) => const LeaveRequestPage(),
                         ),
                       );
+                      if (mounted) {
+                        await context
+                            .read<EmployeeDashboardViewModel>()
+                            .fetchDashboardStats();
+                      }
                     },
                     child: const Text("Apply Leave"),
                   ),
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const LeaveHistoryPage(),
-                        ),
-                      );
-                    },
-                    child: const Text("Leave History"),
-                  ),
 
-                  const SizedBox(height: 16),
-
-                  const SizedBox(height: 16),
                   const SizedBox(height: 16),
                   Expanded(
                     child: GridView.count(

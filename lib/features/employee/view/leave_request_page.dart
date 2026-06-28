@@ -1,3 +1,4 @@
+import 'package:emp_track/features/employee/view/leave_history_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -58,6 +59,19 @@ class _LeaveRequestPageState
 
     return Scaffold(
       appBar: AppBar(
+        actions: [
+            ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const LeaveHistoryPage(),
+                        ),
+                      );
+                    },
+                    child: const Text("Leave History"),
+                  ),
+        ],
         title: const Text("Apply Leave"),
       ),
       body: Padding(
