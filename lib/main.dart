@@ -4,6 +4,9 @@ import 'package:emp_track/features/admin/viemodels/employee_list_viewmodel.dart'
 
 import 'package:emp_track/features/authentication/view/login_page.dart';
 import 'package:emp_track/features/authentication/viewmodels/auth_viewmodel.dart';
+import 'package:emp_track/features/employee/viewmodels/attendance_viewmodel.dart';
+import 'package:emp_track/features/employee/viewmodels/emp_dashbaord_viewmodel.dart';
+import 'package:emp_track/features/employee/viewmodels/leave_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -20,7 +23,9 @@ void main() {
         ),
         ChangeNotifierProvider(create: (_) => AllLeaveRequestsViewmodel()),
                 ChangeNotifierProvider(create: (_) => EmployeeListViewModel()),
-
+    ChangeNotifierProvider(create: (_) => EmployeeDashboardViewModel()),
+    ChangeNotifierProvider(create: (_) => AttendanceViewModel()),
+    ChangeNotifierProvider(create: (_) => LeaveViewModel())
       ],
       child: const MyApp(),
     ),

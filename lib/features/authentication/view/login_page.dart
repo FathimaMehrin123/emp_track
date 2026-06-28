@@ -1,11 +1,10 @@
 import 'package:emp_track/features/authentication/view/register_page.dart';
 import 'package:emp_track/features/authentication/viewmodels/auth_viewmodel.dart';
+import 'package:emp_track/features/employee/view/empl_dashboard_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-
 import '../../admin/view/admin_dashbaord.dart';
-
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -57,14 +56,21 @@ class _LoginPageState extends State<LoginPage> {
                       );
 
                       if (success && mounted) {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => AdminDashboardPage(
-                              token: authViewModel.token!,
+                        if (authViewModel.role == "admin") {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) =>  AdminDashboardPage(token: authViewModel.token!,),
                             ),
-                          ),
-                        );
+                          );
+                        } else {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const EmployeeDashboardPage(),
+                            ),
+                          );
+                        }
                       }
                     },
                     child: const Text("Login"),
@@ -74,9 +80,7 @@ class _LoginPageState extends State<LoginPage> {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                    builder: (_) => const RegisterPage(),
-                  ),
+                  MaterialPageRoute(builder: (_) => const RegisterPage()),
                 );
               },
               child: const Text("Create account"),
