@@ -14,6 +14,7 @@ class LeaveViewModel extends ChangeNotifier {
 
   Future<void> fetchLeaveHistory() async {
     isLoading = true;
+    errorMessage = null;
     notifyListeners();
 
     final prefs = await SharedPreferences.getInstance();
@@ -26,8 +27,15 @@ class LeaveViewModel extends ChangeNotifier {
       return;
     }
 
-    leaveHistory =
+    final result =
         await _leaveApiService.getLeaveHistory(token: token);
+
+    if (result is Map && result.containsKey("error")) {
+      errorMessage = result["error"];
+      leaveHistory = [];
+    } else {
+      leaveHistory = result;
+    }
 
     isLoading = false;
     notifyListeners();

@@ -1,8 +1,7 @@
 import uuid
 from datetime import datetime, timezone
 
-from fastapi import APIRouter, Depends
-
+from fastapi import APIRouter, Depends, HTTPException
 from backend.app.database.database import SessionLocal
 from backend.app.models.attendance_model import Attendance
 from backend.app.models.leave_model import LeaveRequest
@@ -19,50 +18,62 @@ def dashboard_stats(current_user=Depends(get_current_user)):
 
     db = SessionLocal()
 
-    user_id = uuid.UUID(current_user["user_id"])
+    try:
+        user_id = uuid.UUID(current_user["user_id"])
 
-    today = datetime.now(timezone.utc).date()
+        today = datetime.now(timezone.utc).date()
 
-    # For now, working days means total days attendance was marked.
-    working_days = db.query(Attendance).filter(
-        Attendance.user_id == user_id
-    ).count()
+        # For now, working days means total days attendance was marked.
+        working_days = db.query(Attendance).filter(
+            Attendance.user_id == user_id
+        ).count()
 
-    present_days = db.query(Attendance).filter(
-    Attendance.user_id == user_id,
-    or_(
-        Attendance.status == "Present",
-        Attendance.status == "Late"
-    )
-)   .count()
+        present_days = db.query(Attendance).filter(
+            Attendance.user_id == user_id,
+            or_(
+                Attendance.status == "Present",
+                Attendance.status == "Late"
+            )
+        ).count()
 
-    late_days = db.query(Attendance).filter(
-        Attendance.user_id == user_id,
-        Attendance.status == "Late"
-    ).count()
+        late_days = db.query(Attendance).filter(
+            Attendance.user_id == user_id,
+            Attendance.status == "Late"
+        ).count()
 
-    # Simple absent calculation:
-    # If working_days = present_days + late_days, absent_days will be 0.
-    # Later you can calculate this using company calendar/month days.
-    absent_days = 0
+        # Simple absent calculation:
+        # If working_days = present_days + late_days, absent_days will be 0.
+        # Later you can calculate this using company calendar/month days.
+        absent_days = 0
 
-    pending_leaves = db.query(LeaveRequest).filter(
-        LeaveRequest.user_id == user_id,
-        LeaveRequest.status == "Pending"
-    ).count()
+        pending_leaves = db.query(LeaveRequest).filter(
+            LeaveRequest.user_id == user_id,
+            LeaveRequest.status == "Pending"
+        ).count()
 
-    approved_leaves = db.query(LeaveRequest).filter(
-        LeaveRequest.user_id == user_id,
-        LeaveRequest.status == "Approved"
-    ).count()
+        approved_leaves = db.query(LeaveRequest).filter(
+            LeaveRequest.user_id == user_id,
+            LeaveRequest.status == "Approved"
+        ).count()
 
-    db.close()
+        return {
+            "workingDays": working_days,
+            "presentDays": present_days,
+            "lateDays": late_days,
+            "absentDays": absent_days,
+            "pendingLeaves": pending_leaves,
+            "approvedLeaves": approved_leaves
+        }
 
-    return {
-        "workingDays": working_days,
-        "presentDays": present_days,
-        "lateDays": late_days,
-        "absentDays": absent_days,
-        "pendingLeaves": pending_leaves,
-        "approvedLeaves": approved_leaves
-    }
+    except HTTPException:
+        raise
+
+    except Exception as e:
+        print(e)
+        raise HTTPException(
+            status_code=500,
+            detail="Something went wrong while fetching dashboard stats."
+        )
+
+    finally:
+        db.close()

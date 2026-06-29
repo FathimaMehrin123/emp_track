@@ -9,37 +9,54 @@ class AuthApiService {
     required String password,
     String role = "employee",
   }) async {
-    final response = await http.post(
-      Uri.parse(ApiConstants.register),
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: jsonEncode({
-        "name": name,
-        "email": email,
-        "password": password,
-        "role": role,
-      }),
-    );
+    try {
+      final response = await http.post(
+        Uri.parse(ApiConstants.register),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({
+          "name": name,
+          "email": email,
+          "password": password,
+          "role": role,
+        }),
+      );
 
-    return jsonDecode(response.body);
+      final body = jsonDecode(response.body);
+
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        return body;
+      }
+
+      return {"error": body["detail"] ?? "Registration failed"};
+    } catch (e) {
+      return {"error": "Unable to connect to the server."};
+    }
   }
 
   Future<Map<String, dynamic>> login({
     required String email,
     required String password,
   }) async {
+    try{
     final response = await http.post(
       Uri.parse(ApiConstants.login),
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-      body: {
-        "username": email,
-        "password": password,
-      },
+      headers: {"Content-Type": "application/x-www-form-urlencoded"},
+      body: {"username": email, "password": password},
     );
 
-    return jsonDecode(response.body);
+     final body = jsonDecode(response.body);
+
+    if (response.statusCode == 200) {
+      return body;
+    }
+
+    return {
+      "error": body["detail"] ?? "Login failed"
+    };
+  } catch (e) {
+    return {
+      "error": "Unable to connect to the server."
+    };
+  }
   }
 }

@@ -25,7 +25,14 @@ class AllLeaveRequestsViewmodel extends ChangeNotifier {
       return;
     }
 
-    leaves = await _adminApiService.getAllLeaveRequests(token: token);
+    final result = await _adminApiService.getAllLeaveRequests(token: token);
+
+    if (result is Map && result.containsKey("error")) {
+      errorMessage = result["error"];
+      leaves = [];
+    } else {
+      leaves = result;
+    }
 
     isLoading = false;
     notifyListeners();

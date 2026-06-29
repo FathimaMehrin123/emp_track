@@ -15,7 +15,7 @@ class _AttendancePageState extends State<AttendancePage> {
   int? selectedYear;
 
   String formatDateTime(String dateTimeString) {
-    final dateTime = DateTime.parse(dateTimeString);
+    final dateTime = DateTime.parse(dateTimeString).toLocal();
 
     return "${DateFormat("d MMMM yyyy").format(dateTime)}, "
         "${DateFormat("h:mm:ss a").format(dateTime)} IST";

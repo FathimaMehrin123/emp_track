@@ -25,21 +25,35 @@ class LeaveApiService {
         }),
       );
 
-      return jsonDecode(response.body);
+      final body = jsonDecode(response.body);
+
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        return body;
+      }
+
+      return {"error": body["detail"] ?? body["error"] ?? "Leave request failed"};
     } catch (e) {
       print(e);
-      rethrow;
-
-      ///If an exception occurs, the catch block only prints the error and then reaches the end of the function without returning anything.That's why Dart reports something like:The body might complete normally, causing 'null' to be returned...rethrow tells Dart the function won't continue after the exception.
+      return {"error": "Unable to connect to the server."};
     }
   }
 
-  Future<List<dynamic>> getLeaveHistory({required String token}) async {
-    final response = await http.get(
-      Uri.parse(ApiConstants.leaveHistory),
-      headers: {"Authorization": "Bearer $token"},
-    );
+  Future<dynamic> getLeaveHistory({required String token}) async {
+    try {
+      final response = await http.get(
+        Uri.parse(ApiConstants.leaveHistory),
+        headers: {"Authorization": "Bearer $token"},
+      );
 
-    return jsonDecode(response.body);
+      final body = jsonDecode(response.body);
+
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        return body;
+      }
+
+      return {"error": body["detail"] ?? body["error"] ?? "Failed to fetch leave history"};
+    } catch (e) {
+      return {"error": "Unable to connect to the server."};
+    }
   }
 }

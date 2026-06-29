@@ -7,13 +7,23 @@ class DashboardApiService {
   Future<Map<String, dynamic>> getDashboardStats({
     required String token,
   }) async {
-    final response = await http.get(
-      Uri.parse(ApiConstants.empdashboardStats),
-      headers: {
-        "Authorization": "Bearer $token",
-      },
-    );
-print(response.body);
-    return jsonDecode(response.body);
+    try {
+      final response = await http.get(
+        Uri.parse(ApiConstants.empdashboardStats),
+        headers: {
+          "Authorization": "Bearer $token",
+        },
+      );
+      print(response.body);
+      final body = jsonDecode(response.body);
+
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        return body;
+      }
+
+      return {"error": body["detail"] ?? body["error"] ?? "Failed to fetch dashboard stats"};
+    } catch (e) {
+      return {"error": "Unable to connect to the server."};
+    }
   }
 }

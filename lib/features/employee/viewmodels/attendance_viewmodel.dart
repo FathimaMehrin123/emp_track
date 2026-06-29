@@ -51,12 +51,19 @@ class AttendanceViewModel extends ChangeNotifier {
     return;
   }
 
-  attendanceHistory = await _attendanceApiService.getAttendanceHistory(
+  final result = await _attendanceApiService.getAttendanceHistory(
     token: token,
     page: currentPage,
     month: selectedMonth,
     year: selectedYear,
   );
+
+  if (result is Map && result.containsKey("error")) {
+    errorMessage = result["error"];
+    attendanceHistory = [];
+  } else {
+    attendanceHistory = result;
+  }
 
   isLoading = false;
   notifyListeners();

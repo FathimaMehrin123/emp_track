@@ -29,7 +29,12 @@ class EmployeeListViewModel extends ChangeNotifier {
       search: search,
     );
 
-    employees = result;
+    if (result is Map && result.containsKey("error")) {
+      errorMessage = result["error"];
+      employees = [];
+    } else {
+      employees = result;
+    }
     isLoading = false;
     notifyListeners();
   }

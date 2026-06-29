@@ -8,39 +8,59 @@ class AdminApiService {
   Future<Map<String, dynamic>> getDashboardStats({
     required String token,
   }) async {
-    final response = await http.get(
-      Uri.parse(ApiConstants.adminDashboard),
-      headers: {
-        "Authorization": "Bearer $token",
-      },
-    );
+    try {
+      final response = await http.get(
+        Uri.parse(ApiConstants.adminDashboard),
+        headers: {
+          "Authorization": "Bearer $token",
+        },
+      );
 
-    return jsonDecode(response.body);
+      final body = jsonDecode(response.body);
+
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        return body;
+      }
+
+      return {"error": body["detail"] ?? body["error"] ?? "Failed to fetch admin stats"};
+    } catch (e) {
+      return {"error": "Unable to connect to the server."};
+    }
   }
 
   /// Get all employees or search employees by name/email.
-  Future<List<dynamic>> getEmployees({
+  Future<dynamic> getEmployees({
     required String token,
     String? search,
   }) async {
-    // Build the request URL with the optional search query parameter.
-    // If search is provided, the backend receives it as:
-    // GET /admin/employees?search=value
+    try {
+      // Build the request URL with the optional search query parameter.
+      // If search is provided, the backend receives it as:
+      // GET /admin/employees?search=value
 
-    final uri = Uri.parse(ApiConstants.employeeList).replace(
-      queryParameters: {
-        if (search != null && search.isNotEmpty) "search": search,
-      },
-    );
+      final uri = Uri.parse(ApiConstants.employeeList).replace(
+        queryParameters: {
+          if (search != null && search.isNotEmpty) "search": search,
+        },
+      );
 
-    final response = await http.get(
-      uri,
-      headers: {
-        "Authorization": "Bearer $token",
-      },
-    );
+      final response = await http.get(
+        uri,
+        headers: {
+          "Authorization": "Bearer $token",
+        },
+      );
 
-    return jsonDecode(response.body);
+      final body = jsonDecode(response.body);
+
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        return body;
+      }
+
+      return {"error": body["detail"] ?? body["error"] ?? "Failed to fetch employees"};
+    } catch (e) {
+      return {"error": "Unable to connect to the server."};
+    }
   }
 
   /// Approve or reject a leave request.
@@ -50,35 +70,53 @@ class AdminApiService {
     required String status,
     String? adminComment,
   }) async {
-    final response = await http.put(
-      Uri.parse("${ApiConstants.leaveApproval}/$leaveId"),
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer $token",
-      },
-      body: jsonEncode({
-        "status": status,
-        "admin_comment": adminComment,
-      }),
-    );
+    try {
+      final response = await http.put(
+        Uri.parse("${ApiConstants.leaveApproval}/$leaveId"),
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token",
+        },
+        body: jsonEncode({
+          "status": status,
+          "admin_comment": adminComment,
+        }),
+      );
 
-    return jsonDecode(response.body);
+      final body = jsonDecode(response.body);
+
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        return body;
+      }
+
+      return {"error": body["detail"] ?? body["error"] ?? "Failed to update leave status"};
+    } catch (e) {
+      return {"error": "Unable to connect to the server."};
+    }
   }
 
-Future<List<dynamic>> getAllLeaveRequests({
-  required String token,
-}) async {
-  final response = await http.get(
-    Uri.parse("${ApiConstants.baseUrl}/admin/leaves"),
-    headers: {
-      "Authorization": "Bearer $token",
-    },
-  );
+  Future<dynamic> getAllLeaveRequests({
+    required String token,
+  }) async {
+    try {
+      final response = await http.get(
+        Uri.parse("${ApiConstants.baseUrl}/admin/leaves"),
+        headers: {
+          "Authorization": "Bearer $token",
+        },
+      );
 
-  return jsonDecode(response.body);
-}
+      final body = jsonDecode(response.body);
 
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        return body;
+      }
 
+      return {"error": body["detail"] ?? body["error"] ?? "Failed to fetch leave requests"};
+    } catch (e) {
+      return {"error": "Unable to connect to the server."};
+    }
+  }
 }
 
 
