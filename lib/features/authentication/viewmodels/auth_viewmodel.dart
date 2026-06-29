@@ -20,23 +20,30 @@ class AuthViewModel extends ChangeNotifier {
     errorMessage = null;
     notifyListeners();
 
-    final result = await _authApiService.register(
-      name: name,
-      email: email,
-      password: password,
-      role: role,
-    );
+    try {
+      final result = await _authApiService.register(
+        name: name,
+        email: email,
+        password: password,
+        role: role,
+      );
 
-    isLoading = false;
+      isLoading = false;
 
-    if (result.containsKey("error")) {
-      errorMessage = result["error"];
+      if (result.containsKey("error")) {
+        errorMessage = result["error"];
+        notifyListeners();
+        return false;
+      }
+
+      notifyListeners();
+      return true;
+    } catch (e) {
+      isLoading = false;
+      errorMessage = "An unexpected error occurred during registration.";
       notifyListeners();
       return false;
     }
-
-    notifyListeners();
-    return true;
   }
 
   Future<bool> login({required String email, required String password}) async {
@@ -44,42 +51,54 @@ class AuthViewModel extends ChangeNotifier {
     errorMessage = null;
     notifyListeners();
 
-    final result = await _authApiService.login(
-      email: email,
-      password: password,
-    );
+    try {
+      final result = await _authApiService.login(
+        email: email,
+        password: password,
+      );
 
-    isLoading = false;
+      isLoading = false;
 
-    if (result.containsKey("error")) {
-      errorMessage = result["error"];
+      if (result.containsKey("error")) {
+        errorMessage = result["error"];
+        notifyListeners();
+        return false;
+      }
+
+      token = result["access_token"];
+      role = result["role"];
+
+      final prefs = await SharedPreferences.getInstance();
+
+      await prefs.setString("token", token!);
+      await prefs.setString("role", role!);
+
+      notifyListeners();
+      return true;
+    } catch (e) {
+      isLoading = false;
+      errorMessage = "An unexpected error occurred during login.";
       notifyListeners();
       return false;
     }
-
-    token = result["access_token"];
-    role = result["role"];
-
-    final prefs = await SharedPreferences.getInstance();
-
-    await prefs.setString("token", token!);
-    await prefs.setString("role", role!);
-
-    notifyListeners();
-    return true;
   }
 
 
 
 Future<void> logout() async {
-  final prefs = await SharedPreferences.getInstance();
+  try {
+    final prefs = await SharedPreferences.getInstance();
 
-  await prefs.remove("token");
-  await prefs.remove("role");
+    await prefs.remove("token");
+    await prefs.remove("role");
 
-  token = null;
-  role = null;
+    token = null;
+    role = null;
 
-  notifyListeners();
+    notifyListeners();
+  } catch (e) {
+    errorMessage = "An unexpected error occurred during logout.";
+    notifyListeners();
+  }
 }
 }
