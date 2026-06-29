@@ -26,45 +26,80 @@ class _EmployeeListPageState extends State<EmployeeListPage> {
 
     return Scaffold(
       appBar: AppBar(title: const Text("Employees")),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            TextField(
-              controller: searchController,
-              decoration: InputDecoration(
-                labelText: "Search employee",
-                suffixIcon: IconButton(
-                  icon: const Icon(Icons.search),
-                  onPressed: () {
-                    viewModel.fetchEmployees(
-                      search: searchController.text.trim(),
-                    );
-                  },
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 800),
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                TextField(
+                  controller: searchController,
+                  decoration: InputDecoration(
+                    labelText: "Search employee",
+                    border: const OutlineInputBorder(),
+                    suffixIcon: IconButton(
+                      icon: const Icon(Icons.search),
+                      onPressed: () {
+                        viewModel.fetchEmployees(
+                          search: searchController.text.trim(),
+                        );
+                      },
+                    ),
+                  ),
                 ),
-              ),
-            ),
-            const SizedBox(height: 16),
-            if (viewModel.isLoading)
-              const Center(child: CircularProgressIndicator())
-            else
-              Expanded(
-                child: ListView.builder(
-                  itemCount: viewModel.employees.length,
-                  itemBuilder: (context, index) {
-                    final employee = viewModel.employees[index];
+                const SizedBox(height: 24),
+                if (viewModel.isLoading)
+                  const Expanded(
+                    child: Center(child: CircularProgressIndicator()),
+                  )
+                else
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: viewModel.employees.length,
+                      itemBuilder: (context, index) {
+                        final employee = viewModel.employees[index];
 
-                    return Card(
-                      child: ListTile(
-                        title: Text(employee["name"]),
-                        subtitle: Text(employee["email"]),
-                        trailing: Text(employee["role"]),
-                      ),
-                    );
-                  },
-                ),
-              ),
-          ],
+                        return Card(
+                          margin: const EdgeInsets.only(bottom: 12),
+                          elevation: 2,
+                          child: ListTile(
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 8,
+                            ),
+                            title: Text(
+                              employee["name"],
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
+                            ),
+                            subtitle: Text(employee["email"]),
+                            trailing: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                              decoration: BoxDecoration(
+                                color: Theme.of(context).colorScheme.primaryContainer,
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              child: Text(
+                                employee["role"],
+                                style: TextStyle(
+                                  color: Theme.of(context).colorScheme.onPrimaryContainer,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+              ],
+            ),
+          ),
         ),
       ),
     );

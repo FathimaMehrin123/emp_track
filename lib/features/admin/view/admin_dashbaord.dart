@@ -57,46 +57,68 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
           ? const Center(child: CircularProgressIndicator())
           : viewModel.errorMessage != null
           ? Center(child: Text(viewModel.errorMessage!))
-          : Padding(
-              padding: const EdgeInsets.all(16),
-              child: GridView.count(
-                crossAxisCount: 2,
-                crossAxisSpacing: 12,
-                mainAxisSpacing: 12,
-                children: [
-                  DashboardCard(
-                    title: "Total Employees",
-                    value: viewModel.totalEmployees.toString(),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const EmployeeListPage(),
+          : Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 1000),
+                child: Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Overview",
+                        style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
+                      ),
+                      const SizedBox(height: 16),
+                      Expanded(
+                        child: GridView(
+                          gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                            maxCrossAxisExtent: 280,
+                            crossAxisSpacing: 16,
+                            mainAxisSpacing: 16,
+                            childAspectRatio: 1.4,
+                          ),
+                          children: [
+                            DashboardCard(
+                              title: "Total Employees",
+                              value: viewModel.totalEmployees.toString(),
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => const EmployeeListPage(),
+                                  ),
+                                );
+                              },
+                            ),
+                            DashboardCard(
+                              title: "Present Today",
+                              value: viewModel.presentToday.toString(),
+                            ),
+                            DashboardCard(
+                              title: "Late Today",
+                              value: viewModel.lateToday.toString(),
+                            ),
+                            DashboardCard(
+                              title: "Pending Leaves",
+                              value: viewModel.pendingLeaves.toString(),
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => const AllLeaveRequestsPage(),
+                                  ),
+                                );
+                              },
+                            ),
+                          ],
                         ),
-                      );
-                    },
+                      ),
+                    ],
                   ),
-                  DashboardCard(
-                    title: "Present Today",
-                    value: viewModel.presentToday.toString(),
-                  ),
-                  DashboardCard(
-                    title: "Late Today",
-                    value: viewModel.lateToday.toString(),
-                  ),
-                  DashboardCard(
-                    title: "Pending Leaves",
-                    value: viewModel.pendingLeaves.toString(),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const AllLeaveRequestsPage(),
-                        ),
-                      );
-                    },
-                  ),
-                ],
+                ),
               ),
             ),
     );

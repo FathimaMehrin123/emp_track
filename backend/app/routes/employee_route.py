@@ -7,6 +7,7 @@ from backend.app.database.database import SessionLocal
 from backend.app.models.attendance_model import Attendance
 from backend.app.models.leave_model import LeaveRequest
 from backend.app.utils.auth_util import get_current_user
+from sqlalchemy import or_
 
 router = APIRouter(prefix="/dashboard", tags=["Dashboard"])
 
@@ -28,9 +29,12 @@ def dashboard_stats(current_user=Depends(get_current_user)):
     ).count()
 
     present_days = db.query(Attendance).filter(
-        Attendance.user_id == user_id,
-        Attendance.status == "Present"
-    ).count()
+    Attendance.user_id == user_id,
+    or_(
+        Attendance.status == "Present",
+        Attendance.status == "Late"
+    )
+)   .count()
 
     late_days = db.query(Attendance).filter(
         Attendance.user_id == user_id,
@@ -40,7 +44,7 @@ def dashboard_stats(current_user=Depends(get_current_user)):
     # Simple absent calculation:
     # If working_days = present_days + late_days, absent_days will be 0.
     # Later you can calculate this using company calendar/month days.
-    absent_days = working_days - (present_days + late_days)
+    absent_days = 0
 
     pending_leaves = db.query(LeaveRequest).filter(
         LeaveRequest.user_id == user_id,

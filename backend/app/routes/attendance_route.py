@@ -12,6 +12,8 @@ router = APIRouter(prefix="/attendance", tags=["Attendance"])
 
 @router.post("/checkin")
 def check_in(current_user=Depends(get_current_user)):
+    # isinstance(object, type) returns True if the object belongs to the specified type;
+# otherwise, it returns False.
     if isinstance(current_user, dict) and "error" in current_user:
         return current_user
 

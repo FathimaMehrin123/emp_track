@@ -74,90 +74,133 @@ class _LeaveRequestPageState
         ],
         title: const Text("Apply Leave"),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
+      body: Center(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(24),
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 500),
+            child: Card(
+              elevation: 4,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(32),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Text(
+                      "Request Leave",
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                    ),
+                    const SizedBox(height: 24),
+                    DropdownButtonFormField<String>(
+                      initialValue: leaveType,
+                      decoration: const InputDecoration(
+                        labelText: "Leave Type",
+                        border: OutlineInputBorder(),
+                      ),
+                      items: const [
+                        DropdownMenuItem(
+                          value: "Sick",
+                          child: Text("Sick"),
+                        ),
+                        DropdownMenuItem(
+                          value: "Casual",
+                          child: Text("Casual"),
+                        ),
+                        DropdownMenuItem(
+                          value: "Emergency",
+                          child: Text("Emergency"),
+                        ),
+                      ],
+                      onChanged: (value) {
+                        setState(() {
+                          leaveType = value!;
+                        });
+                      },
+                    ),
+                    const SizedBox(height: 20),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: OutlinedButton.icon(
+                            icon: const Icon(Icons.date_range),
+                            onPressed: pickStartDate,
+                            label: Text(
+                              startDate == null
+                                  ? "Start Date"
+                                  : startDate.toString().split(" ")[0],
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: OutlinedButton.icon(
+                            icon: const Icon(Icons.date_range),
+                            onPressed: pickEndDate,
+                            label: Text(
+                              endDate == null
+                                  ? "End Date"
+                                  : endDate.toString().split(" ")[0],
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    TextField(
+                      controller: reasonController,
+                      decoration: const InputDecoration(
+                        labelText: "Reason",
+                        border: OutlineInputBorder(),
+                      ),
+                      maxLines: 3,
+                    ),
+                    const SizedBox(height: 24),
+                    SizedBox(
+                      height: 48,
+                      child: ElevatedButton(
+                        onPressed: () async {
+                          if (startDate == null || endDate == null) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text("Please select start and end dates")),
+                            );
+                            return;
+                          }
 
-            DropdownButton<String>(
-              value: leaveType,
-              isExpanded: true,
-              items: const [
+                          final message = await vm.requestLeave(
+                            leaveType: leaveType,
+                            startDate: startDate!,
+                            endDate: endDate!,
+                            reason: reasonController.text,
+                          );
 
-                DropdownMenuItem(
-                  value: "Sick",
-                  child: Text("Sick"),
+                          if (mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text(message)),
+                            );
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        child: const Text("Submit"),
+                      ),
+                    )
+                  ],
                 ),
-
-                DropdownMenuItem(
-                  value: "Casual",
-                  child: Text("Casual"),
-                ),
-
-                DropdownMenuItem(
-                  value: "Emergency",
-                  child: Text("Emergency"),
-                ),
-              ],
-              onChanged: (value) {
-                setState(() {
-                  leaveType = value!;
-                });
-              },
-            ),
-
-            ElevatedButton(
-              onPressed: pickStartDate,
-              child: Text(
-                startDate == null
-                    ? "Select Start Date"
-                    : startDate.toString().split(" ")[0],
               ),
             ),
-
-            ElevatedButton(
-              onPressed: pickEndDate,
-              child: Text(
-                endDate == null
-                    ? "Select End Date"
-                    : endDate.toString().split(" ")[0],
-              ),
-            ),
-
-            TextField(
-              controller: reasonController,
-              decoration:
-                  const InputDecoration(labelText: "Reason"),
-            ),
-
-            const SizedBox(height: 20),
-
-            ElevatedButton(
-              onPressed: () async {
-
-                if (startDate == null ||
-                    endDate == null) {
-                  return;
-                }
-
-                final message =
-                    await vm.requestLeave(
-                  leaveType: leaveType,
-                  startDate: startDate!,
-                  endDate: endDate!,
-                  reason: reasonController.text,
-                );
-
-                if (mounted) {
-                  ScaffoldMessenger.of(context)
-                      .showSnackBar(
-                    SnackBar(content: Text(message)),
-                  );
-                }
-              },
-              child: const Text("Submit"),
-            )
-          ],
+          ),
         ),
       ),
     );
